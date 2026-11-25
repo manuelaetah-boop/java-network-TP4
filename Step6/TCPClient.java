@@ -46,7 +46,7 @@ public class TCPClient {
          PrintWriter writer = new PrintWriter(
                  socket.getOutputStream(),
                  true,
-                 StandardCharsets.ISO_8859_1)) {
+                 StandardCharsets.UTF_8)) {
 
         System.out.println("Connected to "
                 + serverAddress.getHostAddress()
