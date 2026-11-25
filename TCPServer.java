@@ -1,4 +1,10 @@
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class TCPServer {
 
@@ -23,8 +29,55 @@ public class TCPServer {
 
     // Starts the server
     public void launch() throws IOException {
-        // To be implemented in Step 2
+
+    try (ServerSocket serverSocket = new ServerSocket(port)) {
+
+        running = true;
+        System.out.println("Started: " + this);
+
+        while (true) {
+
+            System.out.println("Waiting for a client...");
+
+            try (Socket socket = serverSocket.accept()) {
+
+                System.out.println("Client connected: "
+                        + socket.getInetAddress());
+
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(
+                                socket.getInputStream(),
+                                StandardCharsets.UTF_8));
+
+                PrintWriter writer = new PrintWriter(
+                        socket.getOutputStream(),
+                        true,
+                        StandardCharsets.UTF_8);
+
+                String msg;
+
+                while ((msg = reader.readLine()) != null) {
+
+                    String response = socket.getInetAddress()
+                            .getHostAddress() + " > " + msg;
+
+                    System.out.println(response);
+
+                    writer.println(response);
+                }
+
+            } catch (IOException e) {
+                System.err.println("Client error: "
+                        + e.getMessage());
+            }
+
+            System.out.println("Client disconnected.");
+        }
+
+    } finally {
+        running = false;
     }
+}
 
     // Describes the state of the server
     @Override
