@@ -1,3 +1,4 @@
+import java.net.ConnectException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -67,6 +68,11 @@ public class TCPClient {
                 // Receive the server response
                 String response = reader.readLine();
 
+                    if (response == null) {
+                        System.err.println("Server closed the connection.");
+                        break;
+                    }
+
                 System.out.println(response);
             }
         }
@@ -75,17 +81,32 @@ public class TCPClient {
     }
 
     /** Starts the client from the command line. */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
-        if (args.length < 2) {
-            System.err.println(
-                    "Usage: java TCPClient <host> <port>");
-            return;
-        }
+    if (args.length < 2) {
+        System.err.println(
+                "Usage: java TCPClient <host> <port>");
+        return;
+    }
 
+    try {
         TCPClient client = new TCPClient(
                 args[0], Integer.parseInt(args[1]));
 
         client.start();
+
+    } catch (UnknownHostException e) {
+        System.err.println("Unknown host: " + args[0]);
+
+    } catch (ConnectException e) {
+        System.err.println(
+                "Cannot connect: server is not running or unreachable.");
+
+    } catch (IllegalArgumentException e) {
+        System.err.println("Invalid port: " + args[1]);
+
+    } catch (IOException e) {
+        System.err.println("Connection error: " + e.getMessage());
+    }
     }
 }
