@@ -5,6 +5,13 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+/**
+ * TCP server that listens on a specified port and handles
+ * client connections sequentially.
+ * <p>
+ * The server receives text messages encoded in UTF-8 and
+ * sends them back to the client, prefixed with its IP address.
+ */
 
 public class TCPServer {
 
