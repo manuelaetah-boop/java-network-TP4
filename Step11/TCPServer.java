@@ -1,3 +1,4 @@
+
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -6,6 +7,14 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * TCP server (TP 4, Step 11).
+ * <p>
+ * Accepts client connections sequentially, receives text messages
+ * using UTF-8 encoding and sends them back to the client,
+ * prefixed with the client's IP address.
+ * Handles client communication errors without stopping the server.
+ */
 public class TCPServer {
 
     /** Port used when none is given. */
@@ -17,78 +26,108 @@ public class TCPServer {
     /** True while the server is running. */
     private boolean running = false;
 
-    // Constructor with a port
+    /**
+     * Creates a TCP server with the specified port.
+     *
+     * @param port the TCP port to listen on
+     */
     public TCPServer(int port) {
         this.port = port;
     }
 
-    // Default constructor
+    /**
+     * Creates a TCP server using the default port.
+     */
     public TCPServer() {
         this(DEFAULT_PORT);
     }
 
-    // Starts the server
+    /**
+     * Launches the TCP server and waits for incoming client connections.
+     * <p>
+     * Handles one client at a time. For each received line,
+     * the server constructs a response containing the client's
+     * IP address followed by the original message.
+     * The response is displayed on the standard output and
+     * sent back to the client using UTF-8 encoding.
+     * After a client disconnects, the server waits for another connection.
+     *
+     * @throws IOException if an I/O error occurs when opening
+     *                     or closing the server socket,
+     *                     or accepting a client connection
+     */
     public void launch() throws IOException {
 
-    try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
 
-        running = true;
-        System.out.println("Started: " + this);
+            running = true;
+            System.out.println("Started: " + this);
 
-        while (true) {
+            while (true) {
 
-            System.out.println("Waiting for a client...");
+                System.out.println("Waiting for a client...");
 
-            Socket clientSocket = serverSocket.accept();
+                Socket clientSocket = serverSocket.accept();
 
-            try (Socket socket = clientSocket) {
+                try (Socket socket = clientSocket) {
 
-                System.out.println("Client connected: "
-                        + socket.getInetAddress());
+                    System.out.println("Client connected: "
+                            + socket.getInetAddress());
 
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(
-                                socket.getInputStream(),
-                                StandardCharsets.UTF_8));
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(
+                                    socket.getInputStream(),
+                                    StandardCharsets.UTF_8));
 
-                PrintWriter writer = new PrintWriter(
-                        socket.getOutputStream(),
-                        true,
-                        StandardCharsets.UTF_8);
+                    PrintWriter writer = new PrintWriter(
+                            socket.getOutputStream(),
+                            true,
+                            StandardCharsets.UTF_8);
 
-                String msg;
+                    String msg;
 
-                while ((msg = reader.readLine()) != null) {
+                    while ((msg = reader.readLine()) != null) {
 
-                    String response = socket.getInetAddress()
-                            .getHostAddress() + " > " + msg;
+                        String response = socket.getInetAddress()
+                                .getHostAddress() + " > " + msg;
 
-                    System.out.println(response);
+                        System.out.println(response);
 
-                    writer.println(response);
+                        writer.println(response);
+                    }
+
+                } catch (IOException e) {
+                    System.err.println("Client error: "
+                            + e.getMessage());
                 }
 
-            } catch (IOException e) {
-                System.err.println("Client error: "
-                        + e.getMessage());
+                System.out.println("Client disconnected.");
             }
 
-            System.out.println("Client disconnected.");
+        } finally {
+            running = false;
         }
-
-    } finally {
-        running = false;
-    }
     }
 
-    // Describes the state of the server
+    /**
+     * Returns a string representation of the server state.
+     *
+     * @return a string containing the port and running state
+     */
     @Override
     public String toString() {
         return "TCPServer[port=" + port
                 + ", running=" + running + "]";
     }
 
-    // Main method
+    /**
+     * Entry point of the TCP server application.
+     * Creates and launches a server using the specified port
+     * or the default port if no argument is provided.
+     *
+     * @param args command-line arguments, optionally containing
+     *             the port number
+     */
     public static void main(String[] args) {
         TCPServer server = (args.length >= 1)
                 ? new TCPServer(Integer.parseInt(args[0]))
