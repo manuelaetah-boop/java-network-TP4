@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Simple UDP client (TP 2, Steps 3 to 9).
+ * Simple UDP client (TP 4, Step 9).
  * <p>
  * Reads lines of text from the standard input and sends each one, encoded
  * in UTF-8 in a separate datagram to the server given on the command line.
