@@ -1,4 +1,5 @@
-﻿import java.io.BufferedReader;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -8,9 +9,11 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * TCP client (TP 3, Step 4).
+ * TCP client (TP 4, Step 4).
+ * <p>
  * Sends lines of text to the server and displays
- * the received responses.
+ * the received responses using UTF-8 encoding.
+ * The client can be stopped using the /quit command.
  */
 public class TCPClient {
 
@@ -20,7 +23,13 @@ public class TCPClient {
     /** Port of the server. */
     private final int serverPort;
 
-    /** Creates a client towards the given server. */
+    /**
+     * Creates a TCP client for the specified server.
+     *
+     * @param host the server hostname or IP address
+     * @param port the server TCP port
+     * @throws UnknownHostException if the hostname cannot be resolved
+     */
     public TCPClient(String host, int port)
             throws UnknownHostException {
 
@@ -28,7 +37,16 @@ public class TCPClient {
         this.serverPort = port;
     }
 
-    /** Starts the TCP client. */
+    /**
+     * Starts the TCP client and establishes a connection to the server.
+     * <p>
+     * Reads messages from the standard input, sends them to the server
+     * and displays the received responses.
+     * The connection is closed when the user enters /quit
+     * or when the standard input reaches its end.
+     *
+     * @throws IOException if an I/O error occurs during communication
+     */
     public void start() throws IOException {
 
         try (Socket socket = new Socket(serverAddress, serverPort);
@@ -74,7 +92,15 @@ public class TCPClient {
         System.out.println("Client stopped.");
     }
 
-    /** Starts the client from the command line. */
+    /**
+     * Entry point of the TCP client application.
+     * Creates and starts a client using the hostname
+     * and port provided as command-line arguments.
+     *
+     * @param args command-line arguments containing the hostname
+     *             and port number
+     * @throws IOException if an I/O error occurs
+     */
     public static void main(String[] args) throws IOException {
 
         if (args.length < 2) {
