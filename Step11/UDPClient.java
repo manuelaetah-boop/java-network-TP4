@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,10 +9,13 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Simple UDP client (TP 2, Steps 3 to 9).
+ * UDP client (TP 4, Step 11).
  * <p>
- * Reads lines of text from the standard input and sends each one, encoded
- * in UTF-8 in a separate datagram to the server given on the command line.
+ * Associates a UDP socket with the specified server address and port.
+ * Reads lines of text from the standard input and sends each one,
+ * encoded in UTF-8, in a separate datagram.
+ * Unlike TCP, connecting a UDP socket does not establish
+ * a reliable connection with the remote server.
  * The client stops when the standard input is closed.
  * <p>
  * Usage: {@code java UDPClient <host> <port>}
@@ -37,22 +41,29 @@ public class UDPClient {
     }
 
     /**
-     * Reads lines from the standard input and sends each one in a datagram,
-     * until the standard input is closed.
+     * Creates a UDP socket and associates it with the server
+     * address and port.
+     * <p>
+     * Reads lines from the standard input and sends each one
+     * in a separate datagram until the standard input is closed.
+     * The same socket is used throughout the session.
      *
-     * @throws IOException if the socket cannot be created or a datagram cannot be sent
+     * @throws IOException if an I/O error occurs while creating
+     *                     the socket, reading input or sending datagrams
      */
     public void launch() throws IOException {
         // One socket for the whole session, so the source port stays the same
         try (DatagramSocket socket = new DatagramSocket();
              BufferedReader in = new BufferedReader(
                      new InputStreamReader(System.in, StandardCharsets.UTF_8))) {
-                        socket.connect(serverAddress, serverPort);
+
+            socket.connect(serverAddress, serverPort);
 
             System.out.println("Sending to " + serverAddress.getHostAddress() + ":" + serverPort
                                + " (Ctrl+D on Linux/macOS, Ctrl+Z then Enter on Windows to quit)");
 
             String line;
+
             // readLine() returns null when the standard input is closed
             while ((line = in.readLine()) != null) {
                 byte[] data = line.getBytes(StandardCharsets.UTF_8);
@@ -61,6 +72,7 @@ public class UDPClient {
                 socket.send(packet);
             }
         }
+
         System.out.println("Client stopped.");
     }
 
