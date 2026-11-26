@@ -1,4 +1,11 @@
-﻿import java.io.IOException;
+/**
+     * Entry point of the TCP server application.
+     * Creates and launches a server using the specified port
+     * or the default port if no argument is provided.
+     *
+     * @param args command-line arguments, optionally containing the port number
+     */
+import java.io.IOException;
 
 public class TCPServer {
 
